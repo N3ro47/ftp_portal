@@ -98,5 +98,18 @@ def upload():
     except Exception as e:
         return f"Upload error: {e}", 500
 
+@app.route('/delete/<path:filename>', methods=['POST'])
+def delete(filename):
+    if 'user' not in session:
+        return 'Please login to delete files', 401
+    
+    try:
+        ftp = get_ftp_connection(session['user'], session['password'])
+        ftp.delete(filename)
+        ftp.quit()
+        return redirect(url_for('user_dashboard'))
+    except Exception as e:
+        return f"Delete error: {e}", 500
+
 if __name__ == '__main__':
     app.run(debug=True)
