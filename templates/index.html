@@ -75,6 +75,9 @@
             cursor: pointer;
             display: inline-block;
             text-align: center;
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: normal;
         }
 
         .btn:hover {
@@ -123,6 +126,7 @@
             padding: 0.75rem;
             text-align: left;
             font-weight: normal;
+            vertical-align: middle;
         }
 
         .data-table tr.clickable-row:hover {
@@ -144,6 +148,11 @@
 
         .data-table .actions-cell form {
             margin: 0;
+        }
+
+        #status-container {
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
         }
 
         /* Flash Messages */
@@ -182,6 +191,28 @@
             padding: 0 0.5rem;
             color: #e0e0e0;
         }
+
+        @media (max-width: 768px) {
+            form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .actions-cell {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+            .actions-cell .btn, .actions-cell form .btn {
+                width: 100%;
+                text-align: center;
+            }
+            .data-table {
+                table-layout: fixed;
+            }
+            .data-table td {
+                word-break: break-all;
+            }
+        }
     </style>
 </head>
 <body>
@@ -207,6 +238,8 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
+
+        <div id="status-container" style="display: none;"></div>
 
         {% if is_logged_in %}
         <div class="bordered-box">
@@ -252,7 +285,7 @@
                             {% set parent_path = current_path.rsplit('/', 1)[0] if '/' in current_path else '' %}
                             <tr class="clickable-row" onclick="window.location.href='{{ url_for('browse', path=parent_path) }}'">
                                 <td>UP</td>
-                                <td>... (Up one level)</td>
+                                <td>.. (Up one level)</td>
                                 <td></td>
                             </tr>
                         {% endif %}
@@ -270,13 +303,15 @@
                             <tr>
                                 <td>FILE</td>
                                 <td>{{ file.name }}</td>
-                                <td class="actions-cell">
-                                    <a href="{{ url_for('download', filename=full_path) }}" class="btn">Download</a>
-                                    {% if is_logged_in %}
-                                    <form action="{{ url_for('delete', filename=full_path) }}" method="post" onsubmit="return confirm('CONFIRM DELETE?');">
-                                        <button type="submit" class="btn">Delete</button>
-                                    </form>
-                                    {% endif %}
+                                <td>
+                                    <div class="actions-cell">
+                                        <a href="{{ url_for('download', filename=full_path) }}" class="btn">Download</a>
+                                        {% if is_logged_in %}
+                                        <form action="{{ url_for('delete', filename=full_path) }}" method="post" onsubmit="return confirm('CONFIRM DELETE?');">
+                                            <button type="submit" class="btn">Delete</button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
