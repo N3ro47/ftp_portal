@@ -1,9 +1,8 @@
 import os
 from flask import Flask, render_template, send_file, request, abort, redirect, url_for, flash, session
-from ftplib import FTP, error_perm 
+from ftplib import FTP_TLS, error_perm 
 from io import BytesIO
 from dotenv import load_dotenv
-from functools import wraps
 from pathlib import Path
 
 load_dotenv()
@@ -16,11 +15,13 @@ FTP_USER = os.getenv('FTP_USER')
 FTP_PASS = os.getenv('FTP_PASS')
 
 def get_ftp_connection(username=None, password=None):
-    ftp = FTP(FTP_HOST)
+    ftp = FTP_TLS(FTP_HOST)
+    ftp.auth()
     if username and password:
         ftp.login(username, password)
     else:
         ftp.login(FTP_USER, FTP_PASS)
+    ftp.prot_p()
     return ftp
 
 def get_files_and_dirs(ftp, path):
@@ -184,5 +185,5 @@ def delete(filename):
     parent_path = os.path.dirname(filename)
     return redirect(url_for('browse', path=parent_path))
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+#if __name__ == '__main__':
+#    app.run(debug=True, host='0.0.0.0', port=5000)
